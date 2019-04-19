@@ -25,7 +25,7 @@
 
             var posfixNotation = Parser.ConvertToRPN(infixNotation);
 
-            //Assert.AreEqual(posfixNotation, target);
+            Assert.AreEqual(posfixNotation, target);
         }
     }
 }
