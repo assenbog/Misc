@@ -1,4 +1,4 @@
-﻿namespace Utilities.RPN
+﻿namespace RPN.Utilities
 {
     using System;
     using System.Text.RegularExpressions;
@@ -12,7 +12,8 @@
         static ExpressionRegex()
         {
             const string numberRegex = @"^.*?(\d*\.\d+E{1}[-+]?\d{1,3}|\d*\.\d+|\d+).*?$";
-            const string operandRegex = @"^.*?(\^|\*|\/|\+|\-).*?$";
+            // Note: () are special types of operands
+            const string operandRegex = @"\s*?\^|\*|\/|\+|\-|\)|\(";
             const string mathFunctionsRegex = @"^.*?(abs|sin|cos|tan|log|alog|asin|acos|atan|sqrt|exp).*?$";
 
             // Use the Compiled option to speed things up
@@ -27,7 +28,7 @@
 
             return match.Success 
                 ? new Tuple<string,int>(match.Groups[1].Value, match.Groups[1].Index) 
-                : new Tuple<string,int>(string.Empty,int.MinValue);
+                : new Tuple<string,int>(string.Empty,int.MaxValue);
         }
 
         public static Tuple<string, int> GetNextOperand(string expression)
@@ -35,8 +36,8 @@
             var match = operandRegEx.Match(expression);
 
             return match.Success
-                ? new Tuple<string, int>(match.Groups[1].Value, match.Groups[1].Index)
-                : new Tuple<string, int>(string.Empty, int.MinValue);
+                ? new Tuple<string, int>(match.Value.Trim(), match.Index)
+                : new Tuple<string, int>(string.Empty, int.MaxValue);
         }
 
         public static Tuple<string, int> GetNextMathFunction(string expression)
@@ -45,7 +46,7 @@
 
             return match.Success
                 ? new Tuple<string, int>(match.Groups[1].Value, match.Groups[1].Index)
-                : new Tuple<string, int>(string.Empty, int.MinValue);
+                : new Tuple<string, int>(string.Empty, int.MaxValue);
         }
     }
 }

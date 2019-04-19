@@ -1,7 +1,7 @@
 ﻿namespace RPN.Tests
 {
     using NUnit.Framework;
-    using Utilities.RPN;
+    using RPN.Utilities;
 
     [TestFixture]
     public class RegExTests
@@ -74,7 +74,7 @@
         [Test]
         public void OperandTest1()
         {
-            var expression = @"(+.23456E-10+";
+            var expression = @" +.23456E-10+";
             var target = "+";
             var matchIndex = 1;
 
@@ -87,9 +87,9 @@
         [Test]
         public void OperandTest2()
         {
-            var expression = @"(5-3)";
+            var expression = @"5-3";
             var target = "-";
-            var matchIndex = 2;
+            var matchIndex = 1;
 
             var operand = ExpressionRegex.GetNextOperand(expression);
 
@@ -100,9 +100,9 @@
         [Test]
         public void OperandTest3()
         {
-            var expression = @"(6/3)";
+            var expression = @"6/3";
             var target = "/";
-            var matchIndex = 2;
+            var matchIndex = 1;
 
             var operand = ExpressionRegex.GetNextOperand(expression);
 
