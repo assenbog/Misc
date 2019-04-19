@@ -1,6 +1,7 @@
 ﻿namespace RPN.Utilities
 {
     using System;
+    using System.Linq;
     using System.Collections.Generic;
     using System.Text;
 
@@ -18,6 +19,7 @@
             var separator = new string(' ', 1);
             var functionsAndOperands = new List<TokenTypes> { TokenTypes.Function, TokenTypes.Operand };
             var operatorPrecedence = new Dictionary<string, int> { { "(", 5 }, { "^", 4 }, { "*", 3 }, { "/", 3 }, { "+", 2 }, { "-", 2 } };
+            var brackets = new[] { "(", ")" };
 
             var rpnSb = new StringBuilder();
             var stack = new Stack<string>();
@@ -41,15 +43,17 @@
                 {
                     string stackPeek = stack.Count > 0 ? stack.Peek() : string.Empty;
                     // Check if the top and of the Stack and the current operand are of the same precedence
+                    // Note: Same rule applies when we're processing an operand and we have function (not one of the brackets!) on top of the stack
                     if (operatorPrecedence.ContainsKey(token.Item1) && operatorPrecedence.ContainsKey(stackPeek) &&
-                        operatorPrecedence[token.Item1] == operatorPrecedence[stackPeek] && token.Item1 != "^")
+                        operatorPrecedence[token.Item1] == operatorPrecedence[stackPeek] && token.Item1 != "^" ||
+                        token.Item2 == TokenTypes.Operand && !brackets.Contains(token.Item1) && ExpressionRegex.IsFunction(stackPeek))
                     {
                         rpnSb.Append($"{stack.Pop()}{separator}");
                         stack.Push(token.Item1);
                     }
                     else if (token.Item1 == ")")
                     {
-                        while (true)
+                        while (stack.Any())
                         {
                             var stackPop = stack.Pop();
                             if (stackPop == "(")

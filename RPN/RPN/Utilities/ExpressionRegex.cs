@@ -11,15 +11,20 @@
 
         static ExpressionRegex()
         {
-            const string numberRegex = @"^.*?(\d*\.\d+E{1}[-+]?\d{1,3}|\d*\.\d+|\d+).*?$";
+            const string numberRegex = @".*?(\d*\.\d+E{1}[-+]?\d{1,3}|\d*\.\d+|\d+).*?";
             // Note: () are special types of operands
             const string operandRegex = @"\s*?\^|\*|\/|\+|\-|\)|\(";
-            const string mathFunctionsRegex = @"^.*?(abs|sin|cos|tan|log|alog|asin|acos|atan|sqrt|exp).*?$";
+            const string mathFunctionsRegex = @".*?(abs|sin|cos|tan|log|alog|asin|acos|atan|sqrt|exp|max).*?";
 
             // Use the Compiled option to speed things up
             numberRegEx = new Regex(numberRegex, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             operandRegEx = new Regex(operandRegex, RegexOptions.Compiled);
             mathFunctionsRegEx = new Regex(mathFunctionsRegex, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        }
+
+        public static bool IsFunction(string expression)
+        {
+            return mathFunctionsRegEx.Match(expression).Success;
         }
 
         public static Tuple<string, int> GetNextNumber(string expression)
