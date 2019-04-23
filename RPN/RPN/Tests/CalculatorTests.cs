@@ -46,5 +46,25 @@
 
             Assert.AreEqual(calculatorResult, 1D);
         }
+
+        [Test]
+        public void Test5()
+        {
+            const string expression = "max(1,2)";
+
+            var calculatorResult = Calculator.Calculate(expression);
+
+            Assert.AreEqual(calculatorResult, 2D);
+        }
+
+        [Test]
+        public void Test6()
+        {
+            const string expression = "min(1,2)";
+
+            var calculatorResult = Calculator.Calculate(expression);
+
+            Assert.AreEqual(calculatorResult, 1D);
+        }
     }
 }
