@@ -50,7 +50,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Tests\CalculatorTests.cs" />
     <Compile Include="Tests\ParserTests.cs" />
+    <Compile Include="Utilities\Calculator.cs" />
     <Compile Include="Utilities\Parser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

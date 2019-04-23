@@ -1,9 +1,8 @@
 ﻿namespace RPN.Utilities
 {
     using System;
-    using System.Linq;
     using System.Collections.Generic;
-    using System.Text;
+    using System.Linq;
 
     public static class Parser
     {
@@ -13,16 +12,18 @@
         /// </summary>
         /// <param name="expression">expression to convert from infix notation to postif notation</param>
         /// <returns>expression in Reverse Polish notation</returns>
-        public static string ConvertToRPN(string expression)
+        public static Stack<string> ConvertToRPN(string inputExpression)
         {
+            var returnValue = new Stack<string>();
             var index = 0;
-            var separator = new string(' ', 1);
             var functionsAndOperands = new List<TokenTypes> { TokenTypes.Function, TokenTypes.Operand };
-            var operatorPrecedence = new Dictionary<string, int> { { "(", 5 }, { "^", 4 }, { "*", 3 }, { "/", 3 }, { "+", 2 }, { "-", 2 } };
+            var operatorPrecedence = new Dictionary<string, int> { { "(", 5 }, { ")", 5 }, { "^", 4 }, { "*", 3 }, { "/", 3 }, { "+", 2 }, { "-", 2 } };
             var brackets = new[] { "(", ")" };
 
-            var rpnSb = new StringBuilder();
+            var rpnSb = new List<string>();
             var stack = new Stack<string>();
+
+            var expression = ExpressionRegex.RemoveAllWhiteSpaces(inputExpression);
 
             while (index < expression.Length)
             {
@@ -35,23 +36,14 @@
 
                 if (token.Item2 == TokenTypes.Number)
                 {
-                    rpnSb.Append($"{token.Item1}{separator}");
-                    index += token.Item3 + token.Item1.Length + 1;
+                    rpnSb.Add(token.Item1);
+                    index += token.Item3 + token.Item1.Length;
                 }
 
                 else if (functionsAndOperands.Contains(token.Item2))
                 {
                     string stackPeek = stack.Count > 0 ? stack.Peek() : string.Empty;
-                    // Check if the top and of the Stack and the current operand are of the same precedence
-                    // Note: Same rule applies when we're processing an operand and we have function (not one of the brackets!) on top of the stack
-                    if (operatorPrecedence.ContainsKey(token.Item1) && operatorPrecedence.ContainsKey(stackPeek) &&
-                        operatorPrecedence[token.Item1] == operatorPrecedence[stackPeek] && token.Item1 != "^" ||
-                        token.Item2 == TokenTypes.Operand && !brackets.Contains(token.Item1) && ExpressionRegex.IsFunction(stackPeek))
-                    {
-                        rpnSb.Append($"{stack.Pop()}{separator}");
-                        stack.Push(token.Item1);
-                    }
-                    else if (token.Item1 == ")")
+                    if (token.Item1 == ")")
                     {
                         while (stack.Any())
                         {
@@ -60,33 +52,46 @@
                             {
                                 break;
                             }
-                            rpnSb.Append($"{stackPop}{separator}");
+                            rpnSb.Add(stackPop);
                         }
+                    }
+                    // Check if the top and of the Stack and the current operand are of the same precedence
+                    // Note: Same rule applies when we're processing an operand and we have function (not one of the brackets!) on top of the stack
+                    else if (operatorPrecedence.ContainsKey(token.Item1) && operatorPrecedence.ContainsKey(stackPeek) &&
+                        operatorPrecedence[token.Item1] == operatorPrecedence[stackPeek] && token.Item1 != "^" ||
+                        token.Item2 == TokenTypes.Operand && !brackets.Contains(token.Item1) && ExpressionRegex.IsFunction(stackPeek))
+                    {
+                        rpnSb.Add(stack.Pop());
+                        stack.Push(token.Item1);
                     }
                     else
                     {
                         stack.Push(token.Item1);
                     }
-                    index += token.Item3 + token.Item1.Length + 1;
+                    index += token.Item3 + token.Item1.Length;
                 }
             }
 
-            while(stack.Count > 0)
+            while (stack.Count > 0)
             {
-                rpnSb.Append($"{stack.Pop()}{separator}");
+                rpnSb.Add(stack.Pop());
             }
 
-            return rpnSb.ToString().Trim();
+            rpnSb.Reverse();
+
+            rpnSb.ForEach(p => returnValue.Push(p));
+
+            return returnValue;
         }
 
-        private static Tuple<string,TokenTypes,int> GetNextToken(string expression)
+        private static Tuple<string, TokenTypes, int> GetNextToken(string expression)
         {
             // Try to get a number first
             var number = ExpressionRegex.GetNextNumber(expression);
-            
+
             // Try function next
             var function = ExpressionRegex.GetNextMathFunction(expression);
-            
+
             // Operand last
             var operand = ExpressionRegex.GetNextOperand(expression);
 
