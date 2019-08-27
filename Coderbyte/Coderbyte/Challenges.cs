@@ -351,5 +351,27 @@
 
             return 0;
         }
+
+        public static int ChessboardTraveling(string str)
+        {
+            var match = Regex.Match(str, @"\((\d{1}) (\d{1})\)\((\d{1}) (\d{1})\)");
+
+            var count = 0;
+
+            if (match.Success)
+            {
+                var startRow = int.Parse(match.Groups[1].ToString());
+                var startCol = int.Parse(match.Groups[2].ToString());
+
+                var chessMove = new ChessMoves(startRow, startCol);
+
+                var endRow = int.Parse(match.Groups[3].ToString());
+                var endCol = int.Parse(match.Groups[4].ToString());
+
+                chessMove.PathsToCell(endRow, endCol, ref count);
+            }
+
+            return count;
+        }
     }
 }

@@ -243,5 +243,21 @@
 
             Assert.AreEqual(iterations, Challenges.KaprekarsConstant(number));
         }
+
+        [Test]
+        public void ChessboardTravelingTest1()
+        {
+            const string text = "(2 2)(4 3)";
+
+            Assert.AreEqual(3, Challenges.ChessboardTraveling(text));
+        }
+
+        [Test]
+        public void ChessboardTravelingTest2()
+        {
+            const string text = "(1 1)(3 3)";
+
+            Assert.AreEqual(6, Challenges.ChessboardTraveling(text));
+        }
     }
 }
